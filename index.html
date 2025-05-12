@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Progress Dashboard (V3)</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Course Progress Dashboard</h1>
+    </header>
+    <main>
+        <div id="filter-container">
+            <input type="text" id="search-box" placeholder="Search courses or batches...">
+        </div>
+        <div id="course-container">
+            <p class="loading-message">Loading course data...</p>
+        </div>
+    </main>
+    <footer>
+        <p>© <span id="current-year"></span> Your Organization. Dates in DD-MM-YYYY.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

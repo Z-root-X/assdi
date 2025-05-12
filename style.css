@@ -1,0 +1,43 @@
+body {
+    font-family: 'Roboto', sans-serif; margin: 0; background-color: #f4f7f6;
+    color: #333; line-height: 1.6;
+}
+header {
+    background-color: #0056b3; color: white; padding: 20px 0;
+    text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+header h1 { margin: 0; font-weight: 500; }
+main { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+#filter-container { margin-bottom: 25px; display: flex; justify-content: center; }
+#search-box {
+    width: 100%; max-width: 400px; padding: 12px 15px; border: 1px solid #ddd;
+    border-radius: 25px; font-size: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s ease;
+}
+#search-box:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.25); }
+#course-container {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px;
+}
+.course-card {
+    background-color: white; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; display: flex; flex-direction: column;
+}
+.course-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
+.course-card h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.25em; color: #0056b3; font-weight: 500; }
+.course-card .batch-info { font-size: 0.9em; color: #555; margin-bottom: 15px; background-color: #e7f3ff; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+.course-card p { margin-bottom: 8px; font-size: 0.95em; }
+.course-card p strong { color: #444; }
+.progress-info { margin-top: auto; /* Pushes progress bar to bottom if card heights vary */}
+.progress-bar-container { width: 100%; background-color: #e9ecef; border-radius: 25px; margin-top: 15px; overflow: hidden; height: 22px; }
+.progress-bar {
+    height: 100%; background-color: #28a745; border-radius: 25px; text-align: center;
+    line-height: 22px; color: white; font-size: 0.8em; font-weight: bold;
+    width: 0%; transition: width 0.8s ease-out, background-color 0.5s ease;
+    white-space: nowrap; padding: 0 8px; box-sizing: border-box;
+}
+.progress-bar.medium { background-color: #ffc107; color: #333; }
+.progress-bar.low { background-color: #dc3545; }
+.loading-message, .error-message, .no-results-message { grid-column: 1 / -1; text-align: center; font-size: 1.1em; color: #777; padding: 30px; }
+footer { text-align: center; padding: 25px 0; margin-top: 40px; background-color: #343a40; color: #f8f9fa; font-size: 0.9em; }
+@media (max-width: 600px) { #course-container { grid-template-columns: 1fr; } header h1 { font-size: 1.5em; } }
