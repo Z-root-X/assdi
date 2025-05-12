@@ -3,25 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Progress Dashboard (V3)</title>
+    <title>Course Dashboard - As-Sunnah Skill Development Institute</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Course Progress Dashboard</h1>
-    </header>
-    <main>
-        <div id="filter-container">
-            <input type="text" id="search-box" placeholder="Search courses or batches...">
+    <header class="site-header">
+        <div class="container">
+            <h1>Course Progress Dashboard</h1>
+            <p class="institute-name">As-Sunnah Skill Development Institute</p>
         </div>
-        <div id="course-container">
-            <p class="loading-message">Loading course data...</p>
+    </header>
+
+    <main class="site-main">
+        <div class="container">
+            <section class="filter-section">
+                <input type="text" id="search-box" placeholder="Search by course name or batch...">
+            </section>
+
+            <section id="course-container" class="course-grid">
+                <div class="status-message loading-message">
+                    <div class="spinner"></div>
+                    <p>Loading course data, please wait...</p>
+                </div>
+                <!-- Course cards will be loaded here by JavaScript -->
+            </section>
         </div>
     </main>
-    <footer>
-        <p>© <span id="current-year"></span> As-Sunnah Skill Development Institute.</p>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>© <span id="current-year"></span> As-Sunnah Skill Development Institute. All rights reserved.</p>
+        </div>
     </footer>
+
+    <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
