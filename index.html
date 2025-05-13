@@ -4,44 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Dashboard - As-Sunnah Skill Development Institute</title>
-    <!-- Google Fonts -->
+    <link rel="icon" href="favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
-    <!-- Stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="site-header">
-        <div class="container">
-            <h1>Course Progress Dashboard</h1>
-            <p class="institute-name">As-Sunnah Skill Development Institute</p>
+        <div class="container header-content">
+            <div class="header-text">
+                <h1>Course Progress Dashboard</h1>
+                <p class="institute-name">As-Sunnah Skill Development Institute</p>
+            </div>
         </div>
     </header>
-
     <main class="site-main">
         <div class="container">
-            <section class="filter-section">
-                <input type="text" id="search-box" placeholder="Search by course name or batch...">
-            </section>
-
-            <section id="course-container" class="course-grid">
-                <div class="status-message loading-message">
-                    <div class="spinner"></div>
-                    <p>Loading course data, please wait...</p>
+            <section class="controls-section" aria-label="Filter and Search Controls">
+                <div class="filter-control">
+                    <label for="course-filter" class="sr-only">Filter by Course Name</label>
+                    <select id="course-filter" aria-label="Filter by Course Name">
+                        <option value="all">All Courses</option>
+                    </select>
                 </div>
-                <!-- Course cards will be loaded here by JavaScript -->
+                <div class="search-control">
+                     <label for="search-box" class="sr-only">Search by Course Name or Batch</label>
+                    <input type="search" id="search-box" placeholder="Search by name or batch..." aria-label="Search by Course Name or Batch">
+                </div>
+            </section>
+            <section id="course-container" class="course-grid" aria-live="polite">
+                <div class="status-message loading-message">
+                    <div class="spinner" role="status" aria-label="Loading"></div>
+                    <p>Loading course data...</p>
+                </div>
             </section>
         </div>
     </main>
-
     <footer class="site-footer">
         <div class="container">
             <p>© <span id="current-year"></span> As-Sunnah Skill Development Institute. All rights reserved.</p>
+            <p class="date-format-notice"></p>
         </div>
     </footer>
-
-    <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
