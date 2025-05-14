@@ -19,34 +19,89 @@
             </div>
         </div>
     </header>
+
     <main class="site-main">
         <div class="container">
             <section class="controls-section" aria-label="Filter and Search Controls">
-                <div class="filter-control">
-                    <label for="course-filter" class="sr-only">Filter by Course Name</label>
-                    <select id="course-filter" aria-label="Filter by Course Name">
-                        <option value="all">All Courses</option>
+                <div class="control-group">
+                    <label for="course-name-filter">Filter by Course:</label>
+                    <select id="course-name-filter" aria-label="Filter by Course Name">
+                        <option value="all">All Course Names</option>
+                        <!-- Options loaded by JS -->
                     </select>
                 </div>
-                <div class="search-control">
-                     <label for="search-box" class="sr-only">Search by Course Name or Batch</label>
-                    <input type="search" id="search-box" placeholder="Search by name or batch..." aria-label="Search by Course Name or Batch">
+                <div class="control-group">
+                    <label for="status-filter">Filter by Status:</label>
+                    <select id="status-filter" aria-label="Filter by Course Status">
+                        <option value="all">All Statuses</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by" aria-label="Sort Courses">
+                        <option value="default">Default Order</option>
+                        <option value="courseNameAsc">Name (A-Z)</option>
+                        <option value="courseNameDesc">Name (Z-A)</option>
+                        <option value="startDateAsc">Start Date (Oldest)</option>
+                        <option value="startDateDesc">Start Date (Newest)</option>
+                        <option value="progressAsc">Progress (Low-High)</option>
+                        <option value="progressDesc">Progress (High-Low)</option>
+                    </select>
+                </div>
+                <div class="control-group search-control-group">
+                    <label for="search-box" class="sr-only">Search by Name or Batch</label>
+                    <input type="search" id="search-box" placeholder="Search name or batch..." aria-label="Search by Course Name or Batch">
                 </div>
             </section>
+
+            <section class="dashboard-summary" aria-label="Dashboard Summary">
+                <div id="summary-container" class="summary-grid">
+                    <div class="summary-item"><strong>Total Courses:</strong> <span id="total-courses">-</span></div>
+                    <div class="summary-item"><strong>In Progress:</strong> <span id="in-progress-courses">-</span></div>
+                    <div class="summary-item"><strong>Upcoming:</strong> <span id="upcoming-courses">-</span></div>
+                    <div class="summary-item"><strong>Completed:</strong> <span id="completed-courses">-</span></div>
+                </div>
+            </section>
+
             <section id="course-container" class="course-grid" aria-live="polite">
                 <div class="status-message loading-message">
                     <div class="spinner" role="status" aria-label="Loading"></div>
                     <p>Loading course data...</p>
                 </div>
+                <!-- Course cards loaded by JS -->
             </section>
         </div>
     </main>
+
     <footer class="site-footer">
         <div class="container">
-            <p>© <span id="current-year"></span> As-Sunnah Skill Development Institute. All rights reserved.</p>
+            <div class="footer-credits">
+                <div class="credit-person">
+                    <img src="nasif.png" alt="Nasif Muhammad" class="profile-pic">
+                    <div class="person-details">
+                        <p class="person-name">Nasif Muhammad</p>
+                        <p class="person-title">System Idea & Guidance</p>
+                        <p class="person-role">Trainer, As-Sunnah Skill Development Institute</p>
+                    </div>
+                </div>
+                <div class="credit-person">
+                    <img src="zihad.png" alt="Zihad Hasan" class="profile-pic">
+                    <div class="person-details">
+                        <p class="person-name">Zihad Hasan</p>
+                        <p class="person-title">Development Support</p>
+                        <p class="person-role">Assistant Trainer, As-Sunnah Skill Development Institute</p>
+                    </div>
+                </div>
+            </div>
+            <hr class="footer-divider">
+            <p class="copyright-text">© <span id="current-year"></span> As-Sunnah Skill Development Institute. All rights reserved.</p>
             <p class="date-format-notice"></p>
         </div>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>

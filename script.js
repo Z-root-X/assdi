@@ -9,8 +9,17 @@ const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwVsTv_ri9
 // --- DOM Elements ---
 const courseContainer = document.getElementById('course-container');
 const searchBox = document.getElementById('search-box');
-const courseFilterSelect = document.getElementById('course-filter');
+const courseNameFilterSelect = document.getElementById('course-name-filter'); // Updated ID
+const statusFilterSelect = document.getElementById('status-filter');
+const sortBySelect = document.getElementById('sort-by');
 const currentYearSpan = document.getElementById('current-year');
+
+// Summary Elements
+const totalCoursesSpan = document.getElementById('total-courses');
+const inProgressCoursesSpan = document.getElementById('in-progress-courses');
+const upcomingCoursesSpan = document.getElementById('upcoming-courses');
+const completedCoursesSpan = document.getElementById('completed-courses');
+
 
 // --- Global State ---
 let allCoursesData = [];
@@ -18,8 +27,7 @@ let uniqueCourseNames = [];
 
 /**
  * Helper Function: Parses DD-MM-YYYY string to a Date object (UTC Midnight).
- * @param {string} dateString - Date in "DD-MM-YYYY" format.
- * @returns {Date|null} Date object (UTC midnight) or null if invalid.
+ * (অপরিবর্তিত)
  */
 function parseDMYtoDateUTC_JS(dateString) {
     if (!dateString || typeof dateString !== 'string') return null;
@@ -43,63 +51,92 @@ function parseDMYtoDateUTC_JS(dateString) {
 }
 
 /**
- * Populates the course filter dropdown.
- * @param {Array} courses - Array of course objects.
+ * Populates the course name filter dropdown.
+ * (নাম পরিবর্তন করা হয়েছে courseFilterSelect -> courseNameFilterSelect)
  */
-function populateCourseFilter(courses) {
-    if (!courseFilterSelect) {
-        console.error("Course filter select element not found.");
+function populateCourseNameFilter(courses) {
+    if (!courseNameFilterSelect) {
+        console.warn("Course name filter select element not found."); // Changed to warn
         return;
     }
     try {
-        const courseNames = courses.map(course => course.courseName).filter(name => name); // Ensure name exists
+        const courseNames = courses.map(course => course.courseName).filter(name => name);
         uniqueCourseNames = [...new Set(courseNames)].sort();
-        courseFilterSelect.innerHTML = '<option value="all">All Courses</option>';
+        courseNameFilterSelect.innerHTML = '<option value="all">All Course Names</option>';
         uniqueCourseNames.forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = name;
-            courseFilterSelect.appendChild(option);
+            courseNameFilterSelect.appendChild(option);
         });
     } catch (error) {
-        console.error("Error populating course filter:", error);
+        console.error("Error populating course name filter:", error);
     }
 }
+
+/**
+ * Updates the dashboard summary section.
+ */
+function updateDashboardSummary(courses) {
+    if (!totalCoursesSpan || !inProgressCoursesSpan || !upcomingCoursesSpan || !completedCoursesSpan) {
+        console.warn("One or more summary span elements not found in DOM.");
+        return;
+    }
+
+    let total = 0; // Start with 0, count valid courses
+    let inProgress = 0;
+    let upcoming = 0;
+    let completed = 0;
+
+    courses.forEach(course => {
+        // Use pre-calculated status if available, otherwise calculate for summary
+        const status = course.status; // Assuming status is pre-calculated and added to course object
+        if (status) { // Only count if status is valid
+            total++; // Increment total for courses that have a determinable status
+            if (status === "In Progress") inProgress++;
+            else if (status === "Upcoming") upcoming++;
+            else if (status === "Completed") completed++;
+            // Ignore "Date Error" or other statuses for these specific counts
+        }
+    });
+
+    totalCoursesSpan.textContent = total;
+    inProgressCoursesSpan.textContent = inProgress;
+    upcomingCoursesSpan.textContent = upcoming;
+    completedCoursesSpan.textContent = completed;
+}
+
 
 /**
  * Fetches course data from the API.
  */
 async function fetchCourseData() {
-    courseContainer.innerHTML = `
-        <div class="status-message loading-message">
-            <div class="spinner" role="status" aria-label="Loading"></div>
-            <p>Loading course data, please wait...</p>
-        </div>`;
-    console.log("Fetching data from API..."); // Debug Log
+    courseContainer.innerHTML = `<div class="status-message loading-message"><div class="spinner"></div><p>Loading course data...</p></div>`;
+    console.log("Fetching data from API...");
 
     try {
         if (!GOOGLE_SHEET_API_URL || GOOGLE_SHEET_API_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE' || GOOGLE_SHEET_API_URL.length < 20) {
-             throw new Error("API URL is not configured. Please update 'GOOGLE_SHEET_API_URL' in script.js.");
+             throw new Error("API URL is not configured in script.js.");
         }
         const response = await fetch(GOOGLE_SHEET_API_URL);
 
         if (!response.ok) {
             let errorMsg = `Network response error. Status: ${response.status} (${response.statusText})`;
-            let responseText = await response.text(); // Get raw response text for debugging
+            let responseText = await response.text();
             console.error(`Fetch failed: ${errorMsg}. Raw response: ${responseText}`);
              try {
-                 const errorData = JSON.parse(responseText); // Try to parse if it was JSON
+                 const errorData = JSON.parse(responseText);
                  if (errorData && errorData.error) errorMsg = `API Error: ${errorData.error}`;
              } catch (e) { /* Ignore if not JSON */ }
             throw new Error(errorMsg);
         }
 
-        const fetchedDataText = await response.text(); // Get response as text first for logging
-        console.log("Raw API Response:", fetchedDataText); // Debug Log
+        const fetchedDataText = await response.text();
+        console.log("Raw API Response:", fetchedDataText);
 
         let fetchedData;
         try {
-             fetchedData = JSON.parse(fetchedDataText); // Now parse as JSON
+             fetchedData = JSON.parse(fetchedDataText);
         } catch (e) {
              console.error("Failed to parse API response as JSON:", e);
              throw new Error("Received invalid data format from API. Check API response and Apps Script logs.");
@@ -111,10 +148,41 @@ async function fetchCourseData() {
             throw new Error("Invalid data structure received from API (expected an array).");
         }
 
-        console.log(`Fetched ${fetchedData.length} course records.`); // Debug Log
-        allCoursesData = fetchedData;
-        populateCourseFilter(allCoursesData);
-        filterAndDisplayCourses(); // Display initial data
+        console.log(`Fetched ${fetchedData.length} course records.`);
+        
+        allCoursesData = fetchedData.map(course => {
+            const startDateObj = parseDMYtoDateUTC_JS(course.startDate);
+            const calculatedEndDateObj = parseDMYtoDateUTC_JS(course.calculatedEndDate);
+            let progress = 0;
+            let status = "Upcoming"; // Default status
+
+            if (startDateObj && calculatedEndDateObj && calculatedEndDateObj.getTime() >= startDateObj.getTime()) {
+                const today = new Date();
+                today.setUTCHours(0, 0, 0, 0);
+                const totalDurationMillis = Math.max(0, calculatedEndDateObj.getTime() - startDateObj.getTime());
+
+                if (today >= startDateObj) {
+                    if (today < calculatedEndDateObj) {
+                        const elapsedMillis = Math.max(0, today.getTime() - startDateObj.getTime());
+                        progress = totalDurationMillis > 0 ? Math.min(100, (elapsedMillis / totalDurationMillis) * 100) : 100;
+                        status = "In Progress";
+                    } else {
+                        progress = 100;
+                        status = "Completed";
+                    }
+                }
+                // If today < startDateObj, status remains "Upcoming" and progress 0
+            } else {
+                console.warn("Course with invalid or missing dates for progress calculation:", course);
+                status = "Date Error"; // Mark courses with invalid dates for status
+                progress = 0; // Or some other indicator
+            }
+            return { ...course, progress: progress, status: status };
+        });
+
+        populateCourseNameFilter(allCoursesData);
+        updateDashboardSummary(allCoursesData);
+        applyFiltersAndSort();
 
     } catch (error) {
         console.error('Error during data fetch and initial processing:', error);
@@ -128,95 +196,120 @@ async function fetchCourseData() {
 }
 
 /**
- * Filters data based on current selections and calls display function.
+ * Filters AND sorts data, then calls display function.
  */
-function filterAndDisplayCourses() {
+function applyFiltersAndSort() {
     const searchTerm = searchBox.value.toLowerCase().trim();
-    const selectedCourse = courseFilterSelect.value;
-    console.log(`Filtering: Course='${selectedCourse}', Search='${searchTerm}'`); // Debug Log
+    const selectedCourseName = courseNameFilterSelect.value;
+    const selectedStatus = statusFilterSelect.value;
+    const sortBy = sortBySelect.value;
 
-    const filteredData = allCoursesData.filter(course => {
-        try { // Add try-catch within filter for robustness
-            const courseNameMatch = selectedCourse === 'all' || (course.courseName && course.courseName === selectedCourse);
+    console.log(`Applying filters: CourseName='${selectedCourseName}', Status='${selectedStatus}', Search='${searchTerm}', Sort='${sortBy}'`);
 
-            const searchMatch = !searchTerm ||
-                                (course.courseName && course.courseName.toLowerCase().includes(searchTerm)) ||
-                                (course.batch && String(course.batch).toLowerCase().includes(searchTerm)); // Safer includes check
 
-            return courseNameMatch && searchMatch;
-        } catch (filterError) {
-            console.error("Error filtering course:", course, filterError);
-            return false; // Exclude problematic course data from filter results
-        }
-    });
+    let processedData = [...allCoursesData];
 
-    console.log(`Displaying ${filteredData.length} filtered courses.`); // Debug Log
-    displayCourses(filteredData);
+    // 1. Filter by Course Name
+    if (selectedCourseName !== 'all') {
+        processedData = processedData.filter(course => course.courseName === selectedCourseName);
+    }
+
+    // 2. Filter by Status
+    if (selectedStatus !== 'all') {
+        processedData = processedData.filter(course => course.status === selectedStatus);
+    }
+
+    // 3. Filter by Search Term (Name or Batch)
+    if (searchTerm) {
+        processedData = processedData.filter(course =>
+            (course.courseName && course.courseName.toLowerCase().includes(searchTerm)) ||
+            (course.batch && String(course.batch).toLowerCase().includes(searchTerm))
+        );
+    }
+
+    // 4. Sort Data
+    switch (sortBy) {
+        case 'courseNameAsc':
+            processedData.sort((a, b) => (a.courseName || "").localeCompare(b.courseName || ""));
+            break;
+        case 'courseNameDesc':
+            processedData.sort((a, b) => (b.courseName || "").localeCompare(a.courseName || ""));
+            break;
+        case 'startDateAsc':
+            processedData.sort((a, b) => {
+                const dateA = parseDMYtoDateUTC_JS(a.startDate);
+                const dateB = parseDMYtoDateUTC_JS(b.startDate);
+                if (!dateA && !dateB) return 0; if (!dateA) return 1; if (!dateB) return -1;
+                return dateA.getTime() - dateB.getTime();
+            });
+            break;
+        case 'startDateDesc':
+            processedData.sort((a, b) => {
+                const dateA = parseDMYtoDateUTC_JS(a.startDate);
+                const dateB = parseDMYtoDateUTC_JS(b.startDate);
+                if (!dateA && !dateB) return 0; if (!dateA) return 1; if (!dateB) return -1;
+                return dateB.getTime() - dateA.getTime();
+            });
+            break;
+        case 'progressAsc':
+            processedData.sort((a, b) => (a.progress || 0) - (b.progress || 0));
+            break;
+        case 'progressDesc':
+            processedData.sort((a, b) => (b.progress || 0) - (a.progress || 0));
+            break;
+    }
+
+    displayCourses(processedData);
 }
 
 
 /**
  * Renders course cards to the DOM.
- * @param {Array} coursesToDisplay - Filtered array of course objects.
  */
 function displayCourses(coursesToDisplay) {
-    courseContainer.innerHTML = ''; // Clear container
+    courseContainer.innerHTML = '';
 
     if (!coursesToDisplay || coursesToDisplay.length === 0) {
-        courseContainer.innerHTML = `
-            <div class="status-message no-results-message">
-                <p>${(searchBox.value || courseFilterSelect.value !== 'all') ? 'No courses found matching your criteria.' : 'No courses available to display.'}</p>
-            </div>`;
+        courseContainer.innerHTML = `<div class="status-message no-results-message"><p>No courses found matching your criteria.</p></div>`;
         return;
     }
 
     coursesToDisplay.forEach((course, index) => {
-         try { // Wrap card creation in try-catch
+         try {
             const startDateString = course.startDate;
             const calculatedEndDateString = course.calculatedEndDate;
+            const statusText = course.status;
+            const progressPercent = course.progress;
 
             if (!course.courseName || !startDateString || !calculatedEndDateString) {
-                throw new Error("Missing essential course data (name or dates).");
+                throw new Error("Missing essential course data for card.");
             }
+             if (statusText === "Date Error") { // Handle courses marked with date error
+                 const card = document.createElement('article');
+                 card.className = 'course-card invalid-date-card';
+                 card.innerHTML = `
+                     <div class="course-details">
+                         <h2>${course.courseName}</h2>
+                         <p class="batch-info">Batch: ${course.batch || 'N/A'}</p>
+                         <p style="color: var(--danger-color);"><strong>Status:</strong> <span class="status-badge date-error">Date Error</span></p>
+                         <p>There is an issue with the date configuration for this course.</p>
+                     </div>`;
+                 courseContainer.appendChild(card);
+                 return; // Skip further processing for this card
+             }
 
-            const startDateObj = parseDMYtoDateUTC_JS(startDateString);
-            const calculatedEndDateObj = parseDMYtoDateUTC_JS(calculatedEndDateString);
 
-            if (!startDateObj || !calculatedEndDateObj || calculatedEndDateObj.getTime() < startDateObj.getTime()) {
-                 throw new Error(`Invalid dates (Start: ${startDateString}, End: ${calculatedEndDateString}).`);
-            }
+            let statusClass = statusText.toLowerCase().replace(/\s+/g, '-');
+            let progressBarClass = statusClass;
 
-            const today = new Date();
-            today.setUTCHours(0, 0, 0, 0);
-
-            let progressPercent = 0;
-            let statusText = "Upcoming";
-            let statusClass = "upcoming";
-            let progressBarClass = "upcoming";
-
-            const totalDurationMillis = Math.max(0, calculatedEndDateObj.getTime() - startDateObj.getTime());
-            const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
-            if (today >= startDateObj) {
-                if (today < calculatedEndDateObj) {
-                    const elapsedMillis = Math.max(0, today.getTime() - startDateObj.getTime());
-                    progressPercent = totalDurationMillis > 0 ? Math.min(100, (elapsedMillis / totalDurationMillis) * 100) : 100;
-                    statusText = "In Progress";
-                    statusClass = "in-progress";
-                } else {
-                    progressPercent = 100;
-                    statusText = "Completed";
-                    statusClass = "completed";
-                }
-            } // else status remains "Upcoming"
-
-            // Determine progress bar color
             if (statusText === "Completed") { progressBarClass = ""; }
             else if (statusText === "In Progress") {
                 if(progressPercent < 35) progressBarClass = "low";
                 else if (progressPercent < 75) progressBarClass = "medium";
                 else progressBarClass = "";
-            } // else keeps 'upcoming'
+            } else if (statusText === "Upcoming") {
+                progressBarClass = "upcoming";
+            }
 
 
             const card = document.createElement('article');
@@ -245,10 +338,9 @@ function displayCourses(coursesToDisplay) {
 
          } catch (cardError) {
              console.error(`Error creating card for course (Index ${index}):`, course, cardError);
-             // Optionally display an error card
              const errorCard = document.createElement('article');
-             errorCard.className = 'course-card error-card'; // Add specific class for styling
-             errorCard.innerHTML = `<h2>Error Displaying Course</h2><p>${course.courseName || 'Unknown Course'}</p><p style="color: var(--danger-color);">Could not render details: ${cardError.message}</p>`;
+             errorCard.className = 'course-card error-card';
+             errorCard.innerHTML = `<h2>Error</h2><p>${course.courseName || 'Unknown Course'}</p><p style="color: var(--danger-color);">Could not display: ${cardError.message}</p>`;
              courseContainer.appendChild(errorCard);
          }
     });
@@ -258,33 +350,30 @@ function displayCourses(coursesToDisplay) {
  * Sets the current year in the footer.
  */
 function setFooterYear() {
-    if (currentYearSpan) {
-        currentYearSpan.textContent = new Date().getFullYear();
-    }
+    if (currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
 }
 
 /**
  * Initializes the dashboard.
  */
 function initializeDashboard() {
-    console.log("Initializing Dashboard..."); // Debug Log
+    console.log("Initializing Dashboard...");
     setFooterYear();
-    // Add event listeners only if elements exist
-    if(searchBox) {
-        searchBox.addEventListener('input', filterAndDisplayCourses);
-    } else { console.warn("Search box element not found."); }
-    if(courseFilterSelect) {
-        courseFilterSelect.addEventListener('change', filterAndDisplayCourses);
-    } else { console.warn("Course filter select element not found."); }
+    if(searchBox) searchBox.addEventListener('input', applyFiltersAndSort);
+    else console.warn("Search box element not found.");
+    if(courseNameFilterSelect) courseNameFilterSelect.addEventListener('change', applyFiltersAndSort);
+    else console.warn("Course name filter select element not found.");
+    if(statusFilterSelect) statusFilterSelect.addEventListener('change', applyFiltersAndSort);
+    else console.warn("Status filter select element not found.");
+    if(sortBySelect) sortBySelect.addEventListener('change', applyFiltersAndSort);
+    else console.warn("Sort by select element not found.");
 
-    fetchCourseData(); // Fetch data on initialization
+    fetchCourseData();
 }
 
 // --- Initialize ---
-// Ensure script runs after the DOM is fully loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeDashboard);
 } else {
-    // DOMContentLoaded has already fired
     initializeDashboard();
 }
