@@ -7,100 +7,123 @@
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container header-content">
-            <div class="header-text">
-                <h1>Course Progress Dashboard</h1>
-                <p class="institute-name">As-Sunnah Skill Development Institute</p>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2 class="brand-title">ASSDI</h2>
             </div>
-        </div>
-    </header>
-
-    <main class="site-main">
-        <div class="container">
-            <section class="controls-section" aria-label="Filter and Search Controls">
-                <div class="control-group">
-                    <label for="course-name-filter">Filter by Course:</label>
-                    <select id="course-name-filter" aria-label="Filter by Course Name">
-                        <option value="all">All Course Names</option>
-                        <!-- Options loaded by JS -->
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="status-filter">Filter by Status:</label>
-                    <select id="status-filter" aria-label="Filter by Course Status">
-                        <option value="all">All Statuses</option>
-                        <option value="Upcoming">Upcoming</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="sort-by">Sort by:</label>
-                    <select id="sort-by" aria-label="Sort Courses">
-                        <option value="default">Default Order</option>
-                        <option value="courseNameAsc">Name (A-Z)</option>
-                        <option value="courseNameDesc">Name (Z-A)</option>
-                        <option value="startDateAsc">Start Date (Oldest)</option>
-                        <option value="startDateDesc">Start Date (Newest)</option>
-                        <option value="progressAsc">Progress (Low-High)</option>
-                        <option value="progressDesc">Progress (High-Low)</option>
-                    </select>
-                </div>
-                <div class="control-group search-control-group">
-                    <label for="search-box" class="sr-only">Search by Name or Batch</label>
-                    <input type="search" id="search-box" placeholder="Search name or batch..." aria-label="Search by Course Name or Batch">
-                </div>
-            </section>
-
-            <section class="dashboard-summary" aria-label="Dashboard Summary">
-                <div id="summary-container" class="summary-grid">
-                    <div class="summary-item"><strong>Total Courses:</strong> <span id="total-courses">-</span></div>
-                    <div class="summary-item"><strong>In Progress:</strong> <span id="in-progress-courses">-</span></div>
-                    <div class="summary-item"><strong>Upcoming:</strong> <span id="upcoming-courses">-</span></div>
-                    <div class="summary-item"><strong>Completed:</strong> <span id="completed-courses">-</span></div>
-                </div>
-            </section>
-
-            <section id="course-container" class="course-grid" aria-live="polite">
-                <div class="status-message loading-message">
-                    <div class="spinner" role="status" aria-label="Loading"></div>
-                    <p>Loading course data...</p>
-                </div>
-                <!-- Course cards loaded by JS -->
-            </section>
-        </div>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-credits">
-                <div class="credit-person">
-                    <img src="nasif.png" alt="Nasif Muhammad" class="profile-pic">
-                    <div class="person-details">
-                        <p class="person-name">Nasif Muhammad</p>
-                        <p class="person-title">System Idea & Guidance</p>
-                        <p class="person-role">Trainer, As-Sunnah Skill Development Institute</p>
-                    </div>
-                </div>
-                <div class="credit-person">
-                    <img src="zihad.png" alt="Zihad Hasan" class="profile-pic">
-                    <div class="person-details">
-                        <p class="person-name">Zihad Hasan</p>
-                        <p class="person-title">Development Support</p>
-                        <p class="person-role">Assistant Trainer, As-Sunnah Skill Development Institute</p>
-                    </div>
-                </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <!-- <a href="#" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Notices</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a> -->
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; <span id="current-year-sidebar">2025</span> ASSDI</p>
             </div>
-            <hr class="footer-divider">
-            <p class="copyright-text">© <span id="current-year"></span> As-Sunnah Skill Development Institute. All rights reserved.</p>
-            <p class="date-format-notice"></p>
+        </aside>
+
+        <div class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Course Dashboard</h1>
+                    <p>Welcome, here's a real-time overview of my institutional courses.</p>
+                </div>
+                <div class="search-control">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-box" placeholder="Search courses by name or batch...">
+                </div>
+            </header>
+
+            <main>
+                <section class="dashboard-summary">
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="card-content">
+                            <h3>Total Courses</h3>
+                            <p class="value" id="total-courses">0</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-spinner"></i></div>
+                        <div class="card-content">
+                            <h3>In Progress</h3>
+                            <p class="value" id="in-progress-courses">0</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="card-content">
+                            <h3>Upcoming</h3>
+                            <p class="value" id="upcoming-courses">0</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="card-content">
+                            <h3>Completed</h3>
+                            <p class="value" id="completed-courses">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="course-table-section">
+                    <div class="table-header">
+                        <h2>All Courses</h2>
+                        <div class="filter-controls">
+                            <select id="course-name-filter"><option value="all">Filter by Course</option></select>
+                            <select id="status-filter">
+                                <option value="all">Filter by Status</option>
+                                <option value="Upcoming">Upcoming</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Date Error">Date Error</option>
+                            </select>
+                            <select id="sort-by">
+                                <option value="startDateDesc">Sort: Newest</option>
+                                <option value="startDateAsc">Sort: Oldest</option>
+                                <option value="courseNameAsc">Sort: Name (A-Z)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-content">
+                        <div class="table-content-header">
+                            <div class="col-course">Course Name</div>
+                            <div class="col-duration">Duration</div>
+                            <div class="col-date">Start Date</div>
+                            <div class="col-date">End Date</div>
+                            <div class="col-status">Status</div>
+                            <div class="col-progress">Progress</div>
+                        </div>
+                        <div id="course-container">
+                            </div>
+                    </div>
+                </section>
+            </main>
         </div>
-    </footer>
+    </div>
 
     <script src="script.js"></script>
 </body>
